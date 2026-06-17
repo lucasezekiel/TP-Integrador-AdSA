@@ -1,0 +1,49 @@
+# Deployment de Nginx con almacenamiento persistente,
+# ConfigMap y Secret
+# Alumno: Lucas Aponte
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-adsa
+  namespace: proyecto-adsa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-adsa
+  template:
+    metadata:
+      labels:
+        app: nginx-adsa
+    spec:
+      containers:
+        - name: nginx
+          image: docker.io/library/nginx:alpine
+
+          ports:
+            - containerPort: 80
+
+          env:
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nginx-secret
+                  key: PASSWORD
+
+          volumeMounts:
+            - name: volumen-persistente
+              mountPath: /usr/share/nginx/html
+
+            - name: pagina-configmap
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+
+      volumes:
+        - name: volumen-persistente
+          persistentVolumeClaim:
+            claimName: pvc-nginx-adsa
+
+        - name: pagina-configmap
+          configMap:
+            name: nginx-config

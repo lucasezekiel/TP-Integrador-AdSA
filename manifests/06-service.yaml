@@ -1,0 +1,15 @@
+# Service interno para exponer el Deployment Nginx
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: proyecto-adsa
+spec:
+  selector:
+    app: nginx-adsa
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
