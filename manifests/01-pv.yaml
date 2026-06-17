@@ -1,0 +1,17 @@
+# Volumen persistente local para el laboratorio Kubernetes con Kind
+# Se utiliza hostPath por tratarse de un entorno local de demostración
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nginx-adsa
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /tmp/proyecto-adsa
+

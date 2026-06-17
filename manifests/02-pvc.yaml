@@ -1,0 +1,15 @@
+# Solicitud de almacenamiento persistente para la aplicación Nginx
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nginx-adsa
+  namespace: proyecto-adsa
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 100Mi
+

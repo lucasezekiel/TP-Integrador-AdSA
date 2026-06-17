@@ -1,0 +1,7 @@
+# Namespace independiente para los recursos del proyecto integrador
+# Alumno: Lucas Aponte
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: proyecto-adsa
