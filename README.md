@@ -3,8 +3,11 @@
 ## Automatización de una aplicación web persistente en Kubernetes
 
 **Alumno:** Lucas Aponte
+
 **Carrera:** Tecnicatura Superior en Administración de Sistemas y Software Libre
+
 **Asignatura:** Administración de Sistemas Avanzada
+
 **Universidad Nacional del Comahue — Complejo Regional Zona Atlántica y Sur**
 
 ---
@@ -407,6 +410,4 @@ La solución constituye un laboratorio sencillo, verificable y reutilizable para
 Este proyecto se distribuye bajo la licencia **GNU General Public License v3.0**, en concordancia con los principios del software libre.
 
 
-
-Universidad Nacional del Comahue
 
