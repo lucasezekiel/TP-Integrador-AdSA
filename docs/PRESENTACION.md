@@ -3,45 +3,40 @@
 ## Automatización de una aplicación web persistente en Kubernetes
 
 **Alumno:** Lucas Aponte
+
 **Carrera:** Tecnicatura Superior en Administración de Sistemas y Software Libre
+
 **Asignatura:** Administración de Sistemas Avanzada
+
 **Universidad Nacional del Comahue**
 
 ---
 
-# 1. Problema abordado
+# 1. Introducción y objetivo del laboratorio
 
-Las aplicaciones ejecutadas en contenedores tienen un ciclo de vida temporal. Cuando un contenedor o un Pod es eliminado, los datos almacenados únicamente dentro de ese entorno pueden perderse.
+Este proyecto consiste en un laboratorio reproducible para desplegar una aplicación web Nginx sobre un clúster local de Kubernetes creado con Kind.
 
-Además, desplegar manualmente cada recurso de Kubernetes implica repetir comandos y aumenta la posibilidad de cometer errores.
+La finalidad del laboratorio es integrar distintos conceptos trabajados durante la materia:
 
-Este proyecto busca resolver ambos problemas mediante:
-
+* contenedores;
+* Kubernetes;
 * configuración declarativa;
 * almacenamiento persistente;
-* automatización del despliegue;
-* validación del estado final;
-* autorrecuperación de la aplicación.
+* ConfigMaps;
+* Secrets;
+* automatización con scripts Bash;
+* validación del despliegue;
+* autorrecuperación de Pods.
+
+La aplicación desplegada es simple, pero permite demostrar conceptos importantes de administración avanzada de sistemas: cómo definir infraestructura mediante manifiestos, cómo separar configuración y datos, y cómo automatizar el ciclo de despliegue y prueba.
+
+## Objetivo
+
+Desarrollar un entorno reproducible que permita desplegar, validar y probar una aplicación web persistente en Kubernetes utilizando manifiestos YAML y scripts Bash.
 
 ---
 
-# 2. Objetivo del proyecto
-
-Desarrollar un laboratorio reproducible para desplegar una aplicación web Nginx sobre un clúster local Kubernetes creado con Kind.
-
-La solución integra:
-
-* manifiestos YAML;
-* Persistent Volume y Persistent Volume Claim;
-* ConfigMap;
-* Secret;
-* Deployment;
-* Service;
-* scripts Bash de despliegue, validación, prueba y limpieza.
-
----
-
-# 3. Arquitectura
+# 2. Arquitectura técnica del laboratorio
 
 ```mermaid
 flowchart TD
@@ -56,114 +51,79 @@ flowchart TD
     PV --> HP[hostPath del nodo Kind]
 ```
 
-## Función de cada componente
+## Descripción general
 
-* **Service:** proporciona el acceso a la aplicación.
-* **Deployment:** mantiene una réplica activa de Nginx.
-* **ConfigMap:** suministra la página `index.html`.
-* **Secret:** inyecta una variable ficticia dentro del contenedor.
-* **PVC:** solicita almacenamiento para la aplicación.
-* **PV:** proporciona el almacenamiento persistente.
-* **Kind:** permite ejecutar el clúster Kubernetes localmente.
+El laboratorio utiliza un clúster Kubernetes local ejecutado con Kind.
+
+Dentro del clúster se despliega una aplicación Nginx administrada por un Deployment. La aplicación expone una página web personalizada mediante un ConfigMap, recibe una variable ficticia desde un Secret y utiliza almacenamiento persistente mediante PV y PVC.
+
+El acceso a la aplicación se realiza desde el navegador local mediante `kubectl port-forward`.
 
 
 ---
 
-# 4. Organización del repositorio
+# 3. Componentes Kubernetes utilizados
 
-```text
-TP-Integrador-AdSA/
-├── README.md
-├── LICENSE
-├── kind/
-│   └── cluster.yaml
-├── manifests/
-│   ├── 00-namespace.yaml
-│   ├── 01-pv.yaml
-│   ├── 02-pvc.yaml
-│   ├── 03-configmap.yaml
-│   ├── 04-secret.yaml
-│   ├── 05-deployment.yaml
-│   └── 06-service.yaml
-├── scripts/
-│   ├── deploy.sh
-│   ├── validate.sh
-│   ├── test-persistence.sh
-│   └── cleanup.sh
-├── web/
-│   └── index.html
-└── docs/
-    └── PRESENTACION.md
+| Recurso               | Función en el laboratorio                |
+| --------------------- | ---------------------------------------- |
+| Namespace             | Aísla los recursos del proyecto          |
+| PersistentVolume      | Proporciona almacenamiento persistente   |
+| PersistentVolumeClaim | Solicita el volumen para la aplicación   |
+| ConfigMap             | Suministra el contenido de la página web |
+| Secret                | Inyecta una variable sensible ficticia   |
+| Deployment            | Administra el Pod de Nginx               |
+| Service               | Expone la aplicación dentro del clúster  |
+
+## Estado deseado
+
+Kubernetes trabaja a partir del estado deseado definido en los manifiestos YAML.
+
+El Deployment indica que debe existir una réplica activa de Nginx. Si el Pod es eliminado, Kubernetes detecta la diferencia entre el estado real y el estado deseado, y crea automáticamente un nuevo Pod.
+
+## Separación de responsabilidades
+
+El proyecto separa:
+
+* la aplicación;
+* la configuración;
+* los datos persistentes;
+* la exposición del servicio;
+* la automatización del procedimiento.
+
+
+---
+
+# 4. Automatización del proyecto
+
+El laboratorio incorpora scripts Bash para evitar ejecutar manualmente cada paso.
+
+## Scripts principales
+
+| Script                | Función                                                      |
+| --------------------- | ------------------------------------------------------------ |
+| `deploy.sh`           | Aplica los manifiestos y despliega la aplicación             |
+| `validate.sh`         | Verifica el estado de los recursos                           |
+| `test-persistence.sh` | Prueba persistencia y recreación del Pod                     |
+| `cleanup.sh`          | Elimina los recursos del proyecto                            |
+| `run-all.sh`          | Ejecuta el flujo completo de despliegue, validación y prueba |
+
+## Ejecución completa
+
+```bash
+./scripts/run-all.sh
+```
+
+Este script permite crear o reutilizar el clúster, desplegar los recursos, validar el estado final y ejecutar la prueba de persistencia.
+
+También puede reconstruir el laboratorio desde cero:
+
+```bash
+./scripts/run-all.sh --fresh
 ```
 
 ---
 
-# 5. Configuración declarativa
-
-Los recursos se definen mediante archivos YAML.
-
-## Recursos implementados
-
-| Recurso               | Función                         |
-| --------------------- | ------------------------------- |
-| Namespace             | Aísla los recursos del proyecto |
-| PersistentVolume      | Proporciona almacenamiento      |
-| PersistentVolumeClaim | Solicita el volumen             |
-| ConfigMap             | Contiene el `index.html`        |
-| Secret                | Almacena una variable ficticia  |
-| Deployment            | Administra el Pod Nginx         |
-| Service               | Permite acceder a la aplicación |
-
-Kubernetes compara el estado real del clúster con el estado deseado definido en los manifiestos.
-
----
-
-# 6. Automatización
-
-El proyecto incorpora cuatro scripts Bash.
-
-## `deploy.sh`
-
-Aplica todos los manifiestos en el orden necesario y espera que el Deployment quede disponible.
-
-```bash
-./scripts/deploy.sh
-```
-
-## `validate.sh`
-
-Comprueba:
-
-* nodo en estado `Ready`;
-* Pod en estado `Running`;
-* PVC en estado `Bound`;
-* ConfigMap disponible;
-* Secret inyectado;
-* contenido de la página web.
-
-```bash
-./scripts/validate.sh
-```
-
-## `test-persistence.sh`
-
-Crea un archivo en el volumen, elimina el Pod y verifica que el archivo siga disponible después de su recreación.
-
-```bash
-./scripts/test-persistence.sh
-```
-
-## `cleanup.sh`
-
-Elimina los recursos creados por el proyecto.
-
-```bash
-./scripts/cleanup.sh
-```
-
----
-
-# 7. Demostración en vivo
+# 5. Demostración en vivo
 
 ## Paso 1 — Verificar el clúster
 
@@ -172,10 +132,12 @@ kind get clusters
 kubectl get nodes
 ```
 
-### Resultado esperado
+Resultado esperado:
 
-* clúster `adsa-integrador`;
-* nodo en estado `Ready`.
+```text
+adsa-integrador
+adsa-integrador-control-plane   Ready
+```
 
 ---
 
@@ -185,15 +147,15 @@ kubectl get nodes
 ./scripts/deploy.sh
 ```
 
-### Resultados importantes
+Resultados importantes:
 
 ```text
 deployment "nginx-adsa" successfully rolled out
 ```
 
 ```text
-Pod: Running
-PVC: Bound
+pod/nginx-adsa   1/1   Running
+persistentvolumeclaim/pvc-nginx-adsa   Bound
 ```
 
 ---
@@ -204,13 +166,17 @@ PVC: Bound
 ./scripts/validate.sh
 ```
 
-### Verificaciones principales
+La validación comprueba:
 
-* Deployment disponible `1/1`;
+* estado del nodo;
+* Deployment disponible;
+* Pod en ejecución;
+* Service creado;
 * PVC enlazado al PV;
-* página del ConfigMap montada;
-* variable del Secret presente.
-
+* ConfigMap disponible;
+* Secret disponible;
+* contenido del `index.html`;
+* variable `PASSWORD` inyectada en el contenedor.
 
 ---
 
@@ -223,19 +189,35 @@ kubectl port-forward \
   8085:80
 ```
 
-Abrir:
+Luego se accede desde el navegador:
 
 ```text
 http://localhost:8085
 ```
 
-La página visible fue proporcionada mediante un ConfigMap, sin modificar ni reconstruir la imagen Nginx.
+La página visible fue proporcionada mediante un ConfigMap, sin necesidad de reconstruir la imagen de Nginx.
 
 ---
 
-# 8. Persistencia y autorrecuperación
+# 6. Persistencia y autorrecuperación
 
-En una terminal:
+La prueba de persistencia se realiza mediante el script:
+
+```bash
+./scripts/test-persistence.sh
+```
+
+## Secuencia de la prueba
+
+```text
+1. Se crea un archivo dentro del volumen persistente.
+2. Se verifica su contenido.
+3. Se elimina el Pod activo.
+4. Kubernetes crea automáticamente un nuevo Pod.
+5. Se comprueba que el archivo sigue existiendo.
+```
+
+Para observar la recreación en tiempo real:
 
 ```bash
 kubectl get pods \
@@ -243,89 +225,60 @@ kubectl get pods \
   --watch
 ```
 
-En otra terminal:
-
-```bash
-./scripts/test-persistence.sh
-```
-
-## Secuencia observada
-
-```text
-Pod activo
-   ↓
-Eliminación del Pod
-   ↓
-Terminating
-   ↓
-Pending
-   ↓
-ContainerCreating
-   ↓
-Running
-```
-
-El Deployment recrea automáticamente el Pod porque su estado deseado establece que debe existir una réplica disponible.
-
-El archivo creado previamente continúa disponible porque se almacena en el volumen persistente.
-
-### Resultado esperado
+## Resultado esperado
 
 ```text
 PRUEBA EXITOSA: el archivo persistió después de recrear el Pod.
 ```
 
+## Explicación técnica
+
+El archivo no se pierde porque no queda guardado únicamente dentro del contenedor. Se almacena en el volumen persistente asociado al PVC.
+
+El Pod puede eliminarse y recrearse, pero el volumen continúa disponible.
+
+
 ---
 
-# 9. Resultados obtenidos
+# 7. Resultados y conclusión
 
 Durante las pruebas se verificó que:
 
 * el clúster local funciona correctamente;
-* el despliegue puede realizarse mediante un único script;
+* el despliegue puede realizarse mediante scripts;
 * el Pod queda en estado `Running`;
-* el PVC queda en estado `Bound`;
-* la página del ConfigMap se visualiza en el navegador;
+* el PVC queda enlazado al PV en estado `Bound`;
+* la aplicación web se visualiza desde el navegador;
+* la página se carga mediante ConfigMap;
 * el Secret se inyecta como variable de entorno;
 * Kubernetes recrea automáticamente el Pod eliminado;
-* los datos persisten después de la recreación;
-* el laboratorio puede limpiarse y volver a desplegarse.
+* los datos persisten después de la recreación del Pod.
+
+## Conclusión
+
+El proyecto permitió integrar contenidos centrales de la materia en un laboratorio simple, verificable y reutilizable.
+
+Los manifiestos YAML permiten definir la infraestructura de manera declarativa, mientras que los scripts Bash automatizan el despliegue, la validación y las pruebas.
+
+La prueba de persistencia demostró que los datos pueden sobrevivir al ciclo de vida del Pod. A su vez, la recreación automática del Pod permitió comprobar el mecanismo de autorrecuperación de Kubernetes.
+
+En síntesis, el laboratorio muestra cómo administrar una aplicación contenedorizada de forma reproducible, separando aplicación, configuración, datos y automatización.
 
 ---
 
+# 8. Cierre de la demostración
 
-# 10. Conclusión
-
-El proyecto permitió integrar conceptos de:
-
-* Kubernetes;
-* contenedores;
-* almacenamiento persistente;
-* configuración declarativa;
-* automatización;
-* validación;
-* autorrecuperación.
-
-Los manifiestos YAML permiten definir la infraestructura de manera reproducible, mientras que los scripts Bash simplifican su despliegue y validación.
-
-La prueba final demostró que Kubernetes puede recrear automáticamente un Pod eliminado y que los datos almacenados en el volumen permanecen disponibles después de esa recreación.
-
-El resultado es un laboratorio simple, reutilizable y verificable para comprender principios fundamentales de administración avanzada de sistemas en entornos cloud-native.
-
----
-
-# 11. Cierre de la demostración
-
-Para eliminar los recursos:
+Para eliminar los recursos del proyecto:
 
 ```bash
 ./scripts/cleanup.sh
 ```
 
-Para eliminar el clúster:
+Para eliminar completamente el clúster Kind:
 
 ```bash
 kind delete cluster --name adsa-integrador
 ```
+
 
 
