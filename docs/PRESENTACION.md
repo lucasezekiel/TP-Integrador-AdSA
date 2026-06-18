@@ -66,7 +66,6 @@ flowchart TD
 * **PV:** proporciona el almacenamiento persistente.
 * **Kind:** permite ejecutar el clúster Kubernetes localmente.
 
-> **Punto para explicar:** la configuración y los datos se administran fuera de la imagen del contenedor.
 
 ---
 
