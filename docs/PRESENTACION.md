@@ -123,7 +123,7 @@ También puede reconstruir el laboratorio desde cero:
 
 ---
 
-# 5. Demostración en vivo
+# 5. Demostración
 
 ## Paso 1 — Verificar el clúster
 
