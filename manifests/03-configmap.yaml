@@ -1,0 +1,23 @@
+# ConfigMap con la pagina principal personalizada de Nginx
+# Alumno: Lucas Aponte
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: proyecto-adsa
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Proyecto Integrador AdSA</title>
+    </head>
+    <body>
+      <h1>Aplicación Nginx en Kubernetes</h1>
+      <p>Proyecto Integrador de Administración de Sistemas Avanzada</p>
+      <p>Alumno: Lucas Aponte</p>
+      <p>Configuración cargada mediante ConfigMap.</p>
+    </body>
+    </html>
