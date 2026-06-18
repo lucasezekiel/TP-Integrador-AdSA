@@ -376,24 +376,7 @@ El Secret incluido utiliza una credencial ficticia. La codificación utilizada p
 
 ---
 
-## 19. Demostración del proyecto
-
-Durante la exposición se realizará el siguiente flujo:
-
-```text
-1. Mostrar la estructura del repositorio.
-2. Crear o verificar el clúster Kind.
-3. Ejecutar deploy.sh.
-4. Ejecutar validate.sh.
-5. Abrir la aplicación en el navegador.
-6. Ejecutar test-persistence.sh.
-7. Mostrar la recreación automática del Pod.
-8. Explicar los resultados y las limitaciones.
-```
-
----
-
-## 20. Conclusión
+## 19. Conclusión
 
 El proyecto permitió integrar conceptos de contenedores, Kubernetes, almacenamiento persistente, configuración declarativa y automatización.
 
@@ -405,7 +388,7 @@ La solución constituye un laboratorio sencillo, verificable y reutilizable para
 
 ---
 
-## 21. Licencia
+## 20. Licencia
 
 Este proyecto se distribuye bajo la licencia **GNU General Public License v3.0**, en concordancia con los principios del software libre.
 
