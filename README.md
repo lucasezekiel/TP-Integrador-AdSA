@@ -185,7 +185,7 @@ git --version
 ## 9. Clonar el repositorio
 
 ```bash
-git clone REPOSITORIO_DEL_PROYECTO
+git clone https://github.com/lucasezekiel/TP-Integrador-AdSA.git
 cd TP-Integrador-AdSA
 ```
 
